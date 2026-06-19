@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="MS-GATEWAY" />
+        <module name="eureka-server" />
+      </profile>
+      <profile name="Annotation profile for MS-LOGISTICA" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+        </processorPath>
+        <module name="MS-SST" />
+        <module name="MS-LOGISTICA" />
+        <module name="MS-INCIDENCIAS" />
+        <module name="MS-NOTIFICACIONES" />
+        <module name="MS-AUTH" />
+        <module name="MS-EMPLEADOS" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="MS-AUTH" options="-parameters" />
+      <module name="MS-EMPLEADOS" options="-parameters" />
+      <module name="MS-GATEWAY" options="-parameters" />
+      <module name="MS-INCIDENCIAS" options="-parameters" />
+      <module name="MS-LOGISTICA" options="-parameters" />
+      <module name="MS-NOTIFICACIONES" options="-parameters" />
+      <module name="MS-SST" options="-parameters" />
+      <module name="eureka-server" options="-parameters" />
+    </option>
+  </component>
+</project>

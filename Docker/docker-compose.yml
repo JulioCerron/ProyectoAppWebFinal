@@ -1,0 +1,206 @@
+version: '3.8'
+
+services:
+  # Base de Datos Centralizada
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: handfast-postgres
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      # Este script crea las bases de datos al iniciar por primera vez
+      - POSTGRES_MULTIPLE_DATABASES=db_auth,db_employees,db_incidents,db_logistica,db_sst,db_notificaciones
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:Z
+    networks:
+      - handfast-network
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: handfast-rabbitmq
+    ports:
+      - "5672:5672"   # Puerto de comunicación AMQP
+      - "15672:15672" # Puerto del panel de control (User: guest / Pass: guest)
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - handfast-network
+
+  # Herramienta visual para ver la base de datos
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: handfast-pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    networks:
+      - handfast-network
+    depends_on:
+      - postgres-db
+
+    # Servidor de Descubrimiento (Eureka)
+  eureka-server:
+    build:
+      context: ../eureka-server  # Ojo con la ruta, sube un nivel y entra a eureka
+      dockerfile: Dockerfile
+    container_name: handfast-eureka
+    ports:
+      - "8761:8761"
+    networks:
+       - handfast-network
+
+    # Microservicio de Autenticación
+  ms-auth:
+   build:
+     context: ../MS-AUTH
+     dockerfile: Dockerfile
+   container_name: handfast-auth
+   ports:
+     - "8081:8081"
+   networks:
+     - handfast-network
+   depends_on:
+     - postgres-db
+     - eureka-server
+   environment:
+        # Sobrescribimos a R2DBC para que use el contenedor 'postgres-db'
+     - SPRING_R2DBC_URL=r2dbc:postgresql://postgres-db:5432/db_auth
+     - SPRING_R2DBC_USERNAME=admin
+     - SPRING_R2DBC_PASSWORD=admin
+        # Sobrescribimos Eureka para que apunte al contenedor 'eureka-server'
+     - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  ms-empleados:
+    build:
+      context: ../MS-EMPLEADOS
+      dockerfile: Dockerfile
+    container_name: handfast-empleados
+    ports:
+      - "8082:8082"
+    networks:
+      - handfast-network
+    depends_on:
+      - postgres-db
+      - eureka-server
+    environment:
+      # Sobrescribimos a R2DBC para que use el contenedor 'postgres-db'
+      - SPRING_R2DBC_URL=r2dbc:postgresql://postgres-db:5432/db_employees
+      - SPRING_R2DBC_USERNAME=admin
+      - SPRING_R2DBC_PASSWORD=admin
+      # Sobrescribimos Eureka para que apunte al contenedor 'eureka-server'
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  ms-gateway:
+    build:
+      context: ../MS-GATEWAY
+      dockerfile: Dockerfile
+    container_name: handfast-gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - handfast-network
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  # Microservicio de Incidencias
+  ms-incidencias:
+    build:
+      context: ../MS-INCIDENCIAS
+      dockerfile: Dockerfile
+    container_name: handfast-incidencias
+    ports:
+      - "8085:8085"             # Puerto indicado en tu server.port
+    networks:
+      - handfast-network
+    depends_on:
+      - postgres-db
+      - eureka-server
+    environment:
+      # Usamos DATASOURCE porque tu properties usa jdbc tradicional
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/db_incidents
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+      # Eureka
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  # Microservicio de Logística
+  ms-logistica:
+    build:
+      context: ../MS-LOGISTICA
+      dockerfile: Dockerfile
+    container_name: handfast-logistica
+    ports:
+      - "8083:8083"
+    networks:
+      - handfast-network
+    depends_on:
+      - postgres-db
+      - eureka-server
+    environment:
+      # Como usa R2DBC, usamos las variables reactivas
+      - SPRING_R2DBC_URL=r2dbc:postgresql://postgres-db:5432/db_logistica
+      - SPRING_R2DBC_USERNAME=admin
+      - SPRING_R2DBC_PASSWORD=admin
+      # Eureka
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  # Microservicio de Notificaciones
+  ms-notificaciones:
+    build:
+      context: ../MS-NOTIFICACIONES
+      dockerfile: Dockerfile
+    container_name: handfast-notificaciones
+    ports:
+      - "8086:8086"
+    networks:
+      - handfast-network
+    depends_on:
+      - postgres-db
+      - eureka-server
+      - rabbitmq                # Ahora también depende de que la cola de mensajes esté lista
+    environment:
+      # R2DBC
+      - SPRING_R2DBC_URL=r2dbc:postgresql://postgres-db:5432/db_notificaciones
+      - SPRING_R2DBC_USERNAME=admin
+      - SPRING_R2DBC_PASSWORD=admin
+      # Eureka
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      # RabbitMQ (Cambiamos el localhost por el nombre del contenedor)
+      - SPRING_RABBITMQ_HOST=rabbitmq
+
+  # Microservicio de Seguridad y Salud en el Trabajo (SST)
+  ms-sst:
+    build:
+      context: ../MS-SST
+      dockerfile: Dockerfile
+    container_name: handfast-sst
+    ports:
+      - "8084:8084"
+    networks:
+      - handfast-network
+    depends_on:
+      - postgres-db
+      - eureka-server
+    environment:
+      # Configuraciones reactivas (R2DBC)
+      - SPRING_R2DBC_URL=r2dbc:postgresql://postgres-db:5432/db_sst
+      - SPRING_R2DBC_USERNAME=admin
+      - SPRING_R2DBC_PASSWORD=admin
+      # Conexión al servidor de nombres Eureka
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+networks:
+  handfast-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+

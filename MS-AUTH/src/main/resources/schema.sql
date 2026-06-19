@@ -1,0 +1,22 @@
+CREATE TABLE  IF NOT EXISTS tbl_usuarios (
+    id SERIAL PRIMARY KEY,
+    nombre_usuario VARCHAR(50) UNIQUE NOT NULL,
+    contrasena VARCHAR(255) NOT NULL,
+    correo VARCHAR(100) UNIQUE NOT NULL,
+    activo BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE  IF NOT EXISTS tbl_roles (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE  IF NOT EXISTS tbl_usuarios_roles (
+    usuario_id INTEGER REFERENCES tbl_usuarios(id) ON DELETE CASCADE,
+    rol_id INTEGER REFERENCES tbl_roles(id) ON DELETE CASCADE,
+    PRIMARY KEY (usuario_id, rol_id)
+);
+
+INSERT INTO tbl_roles (nombre) VALUES ('ROLE_SUPERVISOR') ON CONFLICT DO NOTHING;
+INSERT INTO tbl_roles (nombre) VALUES ('ROLE_COORDINADOR') ON CONFLICT DO NOTHING;
+INSERT INTO tbl_roles (nombre) VALUES ('ROLE_ADMIN') ON CONFLICT DO NOTHING;
