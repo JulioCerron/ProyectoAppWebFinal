@@ -1,0 +1,99 @@
+<main class="min-vh-100 d-flex flex-column flex-lg-row">
+  <!-- Panel lateral de marca -->
+  <section class="d-none d-lg-flex flex-column justify-content-between text-white p-5 position-relative overflow-hidden w-50"
+           style="background: linear-gradient(to bottom right, #0d6efd, #084298);">
+    <div class="position-relative z-1">
+      <div class="d-flex align-items-center gap-3">
+        <div class="rounded bg-white bg-opacity-25 d-flex align-items-center justify-content-center fw-bold fs-4" style="height: 48px; width: 48px;">H</div>
+        <span class="fs-3 fw-bold tracking-tight">HANDFAST</span>
+      </div>
+    </div>
+
+    <div class="position-relative z-1" style="max-width: 400px;">
+      <h1 class="fs-2 fw-semibold">Sistema de Gestion de Incidencias Operativas</h1>
+      <p class="mt-4 text-white-50">
+        Centraliza el registro, seguimiento y notificacion de incidencias.
+      </p>
+
+      <ul class="mt-4 list-unstyled text-white-50 small">
+        <li class="d-flex align-items-center gap-2 mb-2">
+          <span class="rounded-circle bg-white opacity-75" style="height: 6px; width: 6px;"></span>
+          Trazabilidad completa de cada incidencia
+        </li>
+        <li class="d-flex align-items-center gap-2 mb-2">
+          <span class="rounded-circle bg-white opacity-75" style="height: 6px; width: 6px;"></span>
+          Notificaciones automaticas en tiempo real
+        </li>
+        <li class="d-flex align-items-center gap-2 mb-2">
+          <span class="rounded-circle bg-white opacity-75" style="height: 6px; width: 6px;"></span>
+          Seguimiento coordinado entre areas
+        </li>
+      </ul>
+    </div>
+
+    <div class="position-relative z-1 small text-white-50">
+      HANDFAST S.A.C. &middot; Acceso restringido a personal autorizado
+    </div>
+  </section>
+
+  <!-- Formulario de acceso -->
+  <section class="d-flex align-items-center justify-content-center p-4 p-sm-5 w-100 w-lg-50">
+    <div style="max-width: 400px; width: 100%;">
+
+      <!-- Marca compacta para pantallas pequenas -->
+      <div class="d-lg-none d-flex align-items-center gap-3 mb-5">
+        <div class="rounded bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-4" style="height: 48px; width: 48px;">H</div>
+        <span class="fs-3 fw-bold">HANDFAST</span>
+      </div>
+
+      <h2 class="fs-3 fw-semibold">Iniciar sesi&oacute;n</h2>
+      <p class="mt-1 small text-muted">Ingresa tus credenciales para acceder al sistema.</p>
+
+      <form class="mt-4" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Correo / Usuario -->
+        <div class="mb-3">
+          <label for="username" class="form-label small fw-medium">
+            Usuario / Correo corporativo <span class="text-danger">*</span>
+          </label>
+          <input id="username" type="text" formControlName="nombreUsuario" class="form-control" placeholder="Ingrese su usuario">
+          <div *ngIf="submitted && f['nombreUsuario'].errors" class="text-danger small mt-1">
+            <div *ngIf="f['nombreUsuario'].errors['required']">El usuario es requerido</div>
+          </div>
+        </div>
+
+        <!-- Contrasena -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center justify-content-between mb-1">
+            <label for="pass" class="form-label small fw-medium mb-0">
+              Contrase&ntilde;a <span class="text-danger">*</span>
+            </label>
+          </div>
+          <div class="input-group">
+            <input id="pass" [type]="showPassword ? 'text' : 'password'" formControlName="contrasena" class="form-control" placeholder="Ingrese su contraseña">
+            <button type="button" class="btn btn-outline-secondary" (click)="togglePassword()">
+              {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
+          <div *ngIf="submitted && f['contrasena'].errors" class="text-danger small mt-1">
+            <div *ngIf="f['contrasena'].errors['required']">La contraseña es requerida</div>
+          </div>
+        </div>
+
+        <!-- Error global -->
+        <div *ngIf="errorMessage" class="alert alert-danger small py-2 mb-3">
+          {{ errorMessage }}
+        </div>
+
+        <!-- Boton -->
+        <button type="submit" [disabled]="loading" class="btn btn-primary w-100 fw-semibold py-2 shadow-sm">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          Ingresar
+        </button>
+      </form>
+
+      <p class="mt-5 text-center small text-muted">
+        &copy; 2026 HANDFAST S.A.C. &middot; Todos los derechos reservados
+      </p>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,61 @@
+<div *ngIf="loading" class="d-flex justify-content-center py-5">
+  <div class="spinner-border text-primary"></div>
+</div>
+
+<div *ngIf="!loading && incidencia">
+  <div class="mb-4">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <p class="small text-muted mb-1">Incidencias / Mis Incidencias / Detalle</p>
+        <div class="d-flex align-items-center gap-3 mt-1">
+          <h1 class="h4 fw-bold tracking-tight mb-0">INC-00{{ incidencia.id }}</h1>
+          <div class="d-flex align-items-center gap-2 border rounded px-2 py-1 bg-white">
+            <span class="rounded-circle" style="width: 8px; height: 8px;" [ngClass]="{
+              'bg-secondary': incidencia.estado === 'REGISTRADA',
+              'bg-primary': incidencia.estado === 'ASIGNADA',
+              'bg-warning': incidencia.estado === 'EN_PROCESO',
+              'bg-success': incidencia.estado === 'ATENDIDA',
+              'bg-dark': incidencia.estado === 'CERRADA'
+            }"></span>
+            <span class="small fw-medium text-muted">{{ incidencia.estado | titlecase }}</span>
+          </div>
+          
+          <div class="d-flex align-items-center gap-2 border rounded px-2 py-1 bg-white">
+            <span class="rounded-circle" style="width: 8px; height: 8px;" [ngClass]="{
+              'bg-danger': incidencia.prioridad === 'ALTA',
+              'bg-warning': incidencia.prioridad === 'MEDIA',
+              'bg-info': incidencia.prioridad === 'BAJA'
+            }"></span>
+            <span class="small fw-medium text-muted">Prioridad {{ incidencia.prioridad }}</span>
+          </div>
+        </div>
+      </div>
+      <a routerLink="/supervisor/incidencias" class="btn btn-outline-secondary btn-sm">Volver a mis incidencias</a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-8 mx-auto">
+      <div class="card border-0 shadow-sm mb-4">
+    <!-- Fechas -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="h6 fw-bold mb-4">Fechas importantes</h2>
+          <div class="mb-3">
+            <p class="text-muted small mb-1">Creación</p>
+            <p class="small fw-medium">{{ incidencia.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div class="mb-0" *ngIf="incidencia.fechaCierre">
+            <p class="text-muted small mb-1">Cierre</p>
+            <p class="small fw-medium">{{ incidencia.fechaCierre | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div class="mb-0" *ngIf="!incidencia.fechaCierre">
+            <p class="text-muted small mb-1">Cierre</p>
+            <p class="small fw-medium text-muted">Aún no cerrada</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,60 @@
+<div class="mb-4">
+  <p class="small text-muted mb-1">Incidencias / Registrar</p>
+  <h1 class="h3 fw-bold tracking-tight mb-0">Registrar incidencia</h1>
+</div>
+
+<div class="card border-0 shadow-sm" style="max-width: 800px;">
+  <div class="card-body p-4 p-md-5">
+    
+    <div *ngIf="successMessage" class="alert alert-success small py-2">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="alert alert-danger small py-2">{{ errorMessage }}</div>
+
+    <form [formGroup]="registrarForm" (ngSubmit)="registrar()">
+      <div class="mb-4">
+        <label class="form-label small fw-bold">Título <span class="text-danger">*</span></label>
+        <input type="text" formControlName="titulo" placeholder="Resumen breve de la incidencia" class="form-control"
+          [class.is-invalid]="registrarForm.get('titulo')?.invalid && registrarForm.get('titulo')?.touched">
+        <div class="invalid-feedback">El título es obligatorio (mínimo 5 caracteres).</div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <label class="form-label small fw-bold">Prioridad <span class="text-danger">*</span></label>
+          <select formControlName="prioridad" class="form-select" [class.is-invalid]="registrarForm.get('prioridad')?.invalid && registrarForm.get('prioridad')?.touched">
+            <option value="" disabled>Seleccione...</option>
+            <option value="ALTA">Alta</option>
+            <option value="MEDIA">Media</option>
+            <option value="BAJA">Baja</option>
+          </select>
+          <div class="invalid-feedback">La prioridad es obligatoria.</div>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label small fw-bold">Área <span class="text-danger">*</span></label>
+          <select formControlName="areaId" class="form-select" [class.is-invalid]="registrarForm.get('areaId')?.invalid && registrarForm.get('areaId')?.touched">
+            <option value="" disabled>Seleccione...</option>
+            <option value="1">Operaciones (Área 1)</option>
+            <option value="2">Logística (Área 2)</option>
+            <option value="3">SST (Área 3)</option>
+          </select>
+          <div class="invalid-feedback">El área es obligatoria.</div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label small fw-bold">Descripción <span class="text-danger">*</span></label>
+        <textarea formControlName="descripcion" rows="5" placeholder="Detalle de lo ocurrido, ubicación y condiciones relevantes" class="form-control" [class.is-invalid]="registrarForm.get('descripcion')?.invalid && registrarForm.get('descripcion')?.touched"></textarea>
+        <div class="invalid-feedback">La descripción es obligatoria (mínimo 10 caracteres).</div>
+        <p class="text-muted small mt-2 mb-0">Una incidencia debe registrar al menos Prioridad, Área y Descripción.</p>
+      </div>
+
+      <div class="d-flex gap-3 pt-2">
+        <button type="submit" class="btn btn-primary fw-bold px-4" [disabled]="registrarForm.invalid || loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          Registrar incidencia
+        </button>
+        <button type="button" (click)="registrarForm.reset()" class="btn btn-outline-secondary px-4">Limpiar</button>
+      </div>
+    </form>
+  </div>
+</div>

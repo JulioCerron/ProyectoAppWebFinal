@@ -1,0 +1,64 @@
+<div class="mb-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item text-muted small">Logística</li>
+      <li class="breadcrumb-item active small" aria-current="page">Solicitudes</li>
+    </ol>
+  </nav>
+  <h2 class="h3 fw-bold">Solicitudes de Materiales</h2>
+  <p class="text-muted small">El Backend no cuenta con un endpoint GET para listar solicitudes, se muestran datos simulados. El endpoint PUT para atenderlas SÍ funciona.</p>
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="card-header bg-white p-3 border-bottom d-flex gap-3">
+    <select class="form-select w-auto" (change)="filtroEstado = $any($event.target).value; aplicarFiltros()">
+      <option value="">Todos los estados</option>
+      <option value="PENDIENTE">PENDIENTE</option>
+      <option value="ENTREGADO">ENTREGADO</option>
+    </select>
+    <input type="text" class="form-control w-25" placeholder="Buscar por ID Incidencia..." (input)="filtroCodigo = $any($event.target).value; aplicarFiltros()">
+  </div>
+  
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light text-muted small">
+        <tr>
+          <th class="text-uppercase py-3 ps-4">ID Solicitud</th>
+          <th class="text-uppercase py-3">Incidencia</th>
+          <th class="text-uppercase py-3">Material Solicitado</th>
+          <th class="text-uppercase py-3 text-center">Cantidad</th>
+          <th class="text-uppercase py-3 text-center">Estado</th>
+          <th class="text-uppercase py-3 text-end pe-4">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="6" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && solicitudesFiltradas.length === 0">
+          <td colspan="6" class="text-center py-5 text-muted">No hay solicitudes que coincidan.</td>
+        </tr>
+        <tr *ngFor="let s of solicitudesFiltradas">
+          <td class="ps-4 fw-bold text-dark">#{{ s.id }}</td>
+          <td><span class="badge bg-primary bg-opacity-10 text-primary">INC-{{ s.incidenciaId }}</span></td>
+          <td class="fw-medium">{{ s.nombreMaterial }}</td>
+          <td class="text-center fw-bold">{{ s.cantidad }}</td>
+          <td class="text-center">
+            <span class="badge" [ngClass]="s.estado === 'PENDIENTE' ? 'bg-warning text-dark' : 'bg-success text-white'">
+              {{ s.estado }}
+            </span>
+          </td>
+          <td class="text-end pe-4">
+            <button class="btn btn-sm fw-bold border" 
+                    [ngClass]="s.estado === 'PENDIENTE' ? 'btn-primary' : 'btn-light text-muted disabled'"
+                    (click)="atenderSolicitud(s.id)" [disabled]="s.estado !== 'PENDIENTE'">
+              {{ s.estado === 'PENDIENTE' ? 'Entregar Material' : 'Atendida' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,116 @@
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-3 mb-4">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1">
+        <li class="breadcrumb-item text-muted small">Logística</li>
+        <li class="breadcrumb-item active small" aria-current="page">Inventario</li>
+      </ol>
+    </nav>
+    <h2 class="h3 fw-bold mb-0">Gestión de Almacén</h2>
+  </div>
+  <button class="btn btn-primary fw-bold px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#materialModal" (click)="prepararNuevo()">
+    Nuevo Material
+  </button>
+</div>
+
+<div *ngIf="successMessage" class="alert alert-success small py-2">{{ successMessage }}</div>
+<div *ngIf="errorMessage" class="alert alert-danger small py-2">{{ errorMessage }}</div>
+
+<!-- Tabla -->
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white p-3 border-bottom d-flex gap-3">
+    <input type="text" class="form-control w-25" placeholder="Buscar material..." (input)="filtroTexto = $any($event.target).value; aplicarFiltros()">
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light text-muted small">
+        <tr>
+          <th class="text-uppercase py-3 ps-4">Material</th>
+          <th class="text-uppercase py-3">Descripción</th>
+          <th class="text-uppercase py-3 text-center">Stock Actual</th>
+          <th class="text-uppercase py-3 text-center">Stock Mínimo</th>
+          <th class="text-uppercase py-3 text-center pe-4">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="5" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted mb-0">Cargando inventario...</p>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && materialesFiltrados.length === 0">
+          <td colspan="5" class="text-center py-5 text-muted">No hay materiales en el almacén.</td>
+        </tr>
+        <tr *ngFor="let m of materialesFiltrados">
+          <td class="ps-4 fw-bold text-dark">{{ m.nombre }} <span class="badge bg-light text-dark border ms-2">{{ m.unidadMedida }}</span></td>
+          <td class="text-muted small" style="max-width: 250px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ m.descripcion }}</td>
+          <td class="text-center fw-bold fs-5" [ngClass]="{'text-danger': m.stockActual <= m.stockMinimo, 'text-success': m.stockActual > m.stockMinimo}">
+            {{ m.stockActual }}
+          </td>
+          <td class="text-center text-muted">{{ m.stockMinimo }}</td>
+          <td class="text-center pe-4">
+            <span class="badge" [ngClass]="m.stockActual <= m.stockMinimo ? 'bg-danger bg-opacity-10 text-danger' : 'bg-success bg-opacity-10 text-success'">
+              {{ m.stockActual <= m.stockMinimo ? 'Bajo Stock' : 'Disponible' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL NUEVO MATERIAL -->
+<div class="modal fade" id="materialModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold">Registrar Nuevo Material</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form [formGroup]="materialForm" (ngSubmit)="registrarMaterial()">
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Nombre del Material <span class="text-danger">*</span></label>
+            <input type="text" formControlName="nombre" class="form-control" placeholder="Ej. Cable Ethernet Cat6"
+                   [class.is-invalid]="materialForm.get('nombre')?.invalid && materialForm.get('nombre')?.touched">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Descripción <span class="text-danger">*</span></label>
+            <textarea formControlName="descripcion" class="form-control" rows="2" placeholder="Características del material..."
+                      [class.is-invalid]="materialForm.get('descripcion')?.invalid && materialForm.get('descripcion')?.touched"></textarea>
+          </div>
+          
+          <div class="row g-3 mb-3">
+            <div class="col-sm-4">
+              <label class="form-label small fw-bold">Unidad <span class="text-danger">*</span></label>
+              <select formControlName="unidadMedida" class="form-select">
+                <option value="UND">UND (Unidades)</option>
+                <option value="MTS">MTS (Metros)</option>
+                <option value="CJA">CJA (Cajas)</option>
+                <option value="KG">KG (Kilos)</option>
+              </select>
+            </div>
+            <div class="col-sm-4">
+              <label class="form-label small fw-bold">Stock Actual <span class="text-danger">*</span></label>
+              <input type="number" formControlName="stockActual" class="form-control" min="0"
+                     [class.is-invalid]="materialForm.get('stockActual')?.invalid && materialForm.get('stockActual')?.touched">
+            </div>
+            <div class="col-sm-4">
+              <label class="form-label small fw-bold">Stock Mínimo <span class="text-danger">*</span></label>
+              <input type="number" formControlName="stockMinimo" class="form-control" min="0"
+                     [class.is-invalid]="materialForm.get('stockMinimo')?.invalid && materialForm.get('stockMinimo')?.touched">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top bg-light">
+          <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-bold" [disabled]="materialForm.invalid || submitLoading" data-bs-dismiss="modal">
+            <span *ngIf="submitLoading" class="spinner-border spinner-border-sm me-2"></span>
+            Guardar Material
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,116 @@
+<div class="mb-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-1">
+      <li class="breadcrumb-item text-muted small">Administración</li>
+      <li class="breadcrumb-item active small" aria-current="page">Empleados</li>
+    </ol>
+  </nav>
+  <h2 class="h3 fw-bold">Gestión de Empleados</h2>
+</div>
+
+<div class="row g-4">
+  <!-- Formulario -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h5 class="card-title fw-bold mb-4">{{ isEdit ? 'Editar' : 'Registrar' }} empleado</h5>
+        
+        <form [formGroup]="empleadoForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Nombre <span class="text-danger">*</span></label>
+            <input type="text" formControlName="nombre" class="form-control" placeholder="Nombres"
+                   [class.is-invalid]="empleadoForm.get('nombre')?.invalid && empleadoForm.get('nombre')?.touched">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Apellido <span class="text-danger">*</span></label>
+            <input type="text" formControlName="apellido" class="form-control" placeholder="Apellidos"
+                   [class.is-invalid]="empleadoForm.get('apellido')?.invalid && empleadoForm.get('apellido')?.touched">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-bold">DNI <span class="text-danger">*</span></label>
+            <input type="text" formControlName="dni" class="form-control" placeholder="00000000" maxlength="8"
+                   [class.is-invalid]="empleadoForm.get('dni')?.invalid && empleadoForm.get('dni')?.touched">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Área <span class="text-danger">*</span></label>
+            <select formControlName="departamentoId" class="form-select"
+                    [class.is-invalid]="empleadoForm.get('departamentoId')?.invalid && empleadoForm.get('departamentoId')?.touched">
+              <option [ngValue]="1">Operaciones</option>
+              <option [ngValue]="2">Logística</option>
+              <option [ngValue]="3">SST</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label small fw-bold">Cargo <span class="text-danger">*</span></label>
+            <input type="text" formControlName="cargo" class="form-control" placeholder="Ej. Técnico de campo"
+                   [class.is-invalid]="empleadoForm.get('cargo')?.invalid && empleadoForm.get('cargo')?.touched">
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary fw-bold px-4" [disabled]="empleadoForm.invalid || submitLoading">
+              <span *ngIf="submitLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              {{ isEdit ? 'Actualizar' : 'Guardar' }}
+            </button>
+            <button type="button" class="btn btn-light border fw-bold" (click)="resetForm()">Limpiar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white p-3 border-bottom d-flex gap-3">
+        <select class="form-select w-auto" (change)="filtroArea = $any($event.target).value; aplicarFiltros()">
+          <option value="">Todas las áreas</option>
+          <option value="Operaciones">Operaciones</option>
+          <option value="Logística">Logística</option>
+          <option value="SST">SST</option>
+        </select>
+        <input type="text" class="form-control" placeholder="Buscar por nombre o cargo" (input)="filtroTexto = $any($event.target).value; aplicarFiltros()">
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light text-muted small">
+            <tr>
+              <th class="text-uppercase py-3 ps-4">Nombre Completo</th>
+              <th class="text-uppercase py-3">DNI</th>
+              <th class="text-uppercase py-3">Área</th>
+              <th class="text-uppercase py-3">Cargo</th>
+              <th class="text-uppercase py-3 text-end pe-4">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="loading">
+              <td colspan="5" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted mb-0">Cargando empleados...</p>
+              </td>
+            </tr>
+            <tr *ngIf="!loading && empleadosFiltrados.length === 0">
+              <td colspan="5" class="text-center py-5 text-muted">No hay empleados que coincidan con los filtros.</td>
+            </tr>
+            <tr *ngFor="let empleado of empleadosFiltrados">
+              <td class="ps-4 fw-bold text-dark">{{ empleado.nombre }} {{ empleado.apellido }}</td>
+              <td class="text-muted">{{ empleado.dni }}</td>
+              <td>{{ empleado.nombreDepartamento || 'N/A' }}</td>
+              <td>{{ empleado.cargo }}</td>
+              <td class="text-end pe-4">
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-light border" (click)="editarEmpleado(empleado)">Editar</button>
+                  <button class="btn btn-sm btn-light border text-danger" (click)="eliminarEmpleado(empleado.id)">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

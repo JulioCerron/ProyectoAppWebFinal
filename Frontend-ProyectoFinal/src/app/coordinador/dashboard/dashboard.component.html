@@ -1,0 +1,140 @@
+<div class="mb-4">
+  <p class="small text-muted mb-1">Incidencias / Dashboard</p>
+  <h1 class="h3 fw-bold tracking-tight mb-0">Panel de control</h1>
+</div>
+
+<!-- Tarjetas de KPIs -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-sm-4 col-xl">
+    <div class="card border-0 shadow-sm border-start border-4" style="border-left-color: #6c757d !important;">
+      <div class="card-body p-3 p-xl-4">
+        <p class="small text-muted mb-1">Registradas</p>
+        <p class="fs-2 fw-bold mb-0 lh-1">{{ registradas }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-sm-4 col-xl">
+    <div class="card border-0 shadow-sm border-start border-4" style="border-left-color: #0d6efd !important;">
+      <div class="card-body p-3 p-xl-4">
+        <p class="small text-muted mb-1">Asignadas</p>
+        <p class="fs-2 fw-bold mb-0 lh-1">{{ asignadas }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-sm-4 col-xl">
+    <div class="card border-0 shadow-sm border-start border-4" style="border-left-color: #fd7e14 !important;">
+      <div class="card-body p-3 p-xl-4">
+        <p class="small text-muted mb-1">En proceso</p>
+        <p class="fs-2 fw-bold mb-0 lh-1">{{ enProceso }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-sm-6 col-xl">
+    <div class="card border-0 shadow-sm border-start border-4" style="border-left-color: #198754 !important;">
+      <div class="card-body p-3 p-xl-4">
+        <p class="small text-muted mb-1">Atendidas</p>
+        <p class="fs-2 fw-bold mb-0 lh-1">{{ atendidas }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl">
+    <div class="card border-0 shadow-sm border-start border-4 bg-light" style="border-left-color: #495057 !important;">
+      <div class="card-body p-3 p-xl-4">
+        <p class="small text-muted mb-1">Cerradas</p>
+        <p class="fs-2 fw-bold mb-0 lh-1">{{ cerradas }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Gráficos estáticos (Pendiente integración real) -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4">
+        <h2 class="h6 fw-bold mb-4">Incidencias por área</h2>
+        <div class="d-flex flex-column align-items-center gap-4">
+          <div class="position-relative rounded-circle shadow-sm" style="width: 150px; height: 150px; background: conic-gradient(#0d6efd 0 40%, #fd7e14 40% 75%, #198754 75% 100%)">
+            <div class="position-absolute bg-white rounded-circle d-flex flex-column align-items-center justify-content-center" style="inset: 22%;">
+              <span class="fs-3 fw-bold lh-1">{{ total }}</span>
+              <span class="small text-muted">total</span>
+            </div>
+          </div>
+          <ul class="list-unstyled w-100 small mb-0 d-flex flex-column gap-2">
+            <li class="d-flex align-items-center gap-2"><span class="rounded-1" style="width:12px;height:12px;background:#0d6efd"></span> Operaciones</li>
+            <li class="d-flex align-items-center gap-2"><span class="rounded-1" style="width:12px;height:12px;background:#fd7e14"></span> Logística</li>
+            <li class="d-flex align-items-center gap-2"><span class="rounded-1" style="width:12px;height:12px;background:#198754"></span> SST</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4 d-flex flex-column">
+        <h2 class="h6 fw-bold mb-4">Volumen reciente</h2>
+        <div class="flex-grow-1 bg-light rounded d-flex align-items-center justify-content-center text-muted small">
+          (Gráfico de barras pendiente de implementación)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Incidencias recientes -->
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white border-bottom p-4 d-flex align-items-center justify-content-between">
+    <h2 class="h6 fw-bold mb-0">Incidencias recientes</h2>
+    <a routerLink="/coordinador/incidencias" class="small fw-medium text-decoration-none">Ver todas</a>
+  </div>
+  
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light text-muted small">
+        <tr>
+          <th class="py-3 ps-4 text-uppercase">Título</th>
+          <th class="py-3 text-uppercase">Prioridad</th>
+          <th class="py-3 text-uppercase">Estado</th>
+          <th class="py-3 text-uppercase pe-4">Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="4" class="text-center py-4">
+            <div class="spinner-border spinner-border-sm text-primary me-2"></div> Cargando incidencias...
+          </td>
+        </tr>
+        <tr *ngIf="!loading && incidencias.length === 0">
+          <td colspan="4" class="text-center py-4 text-muted">No hay incidencias registradas.</td>
+        </tr>
+        <tr *ngFor="let i of incidencias | slice:0:5">
+          <td class="ps-4 fw-medium text-dark">{{ i.titulo }}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span class="rounded-circle" style="width: 10px; height: 10px;" [ngClass]="{
+                'bg-danger': i.prioridad === 'ALTA',
+                'bg-warning': i.prioridad === 'MEDIA',
+                'bg-info': i.prioridad === 'BAJA'
+              }"></span>
+              <span class="small fw-medium">{{ i.prioridad }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span class="rounded-circle" style="width: 10px; height: 10px;" [ngClass]="{
+                'bg-secondary': i.estado === 'REGISTRADA',
+                'bg-primary': i.estado === 'ASIGNADA',
+                'bg-warning': i.estado === 'EN_PROCESO',
+                'bg-success': i.estado === 'ATENDIDA',
+                'bg-dark': i.estado === 'CERRADA'
+              }"></span>
+              <span class="small fw-medium">{{ i.estado | titlecase }}</span>
+            </div>
+          </td>
+          <td class="pe-4 text-muted small">{{ i.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

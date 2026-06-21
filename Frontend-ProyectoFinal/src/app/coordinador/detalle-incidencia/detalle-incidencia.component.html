@@ -1,0 +1,108 @@
+<div *ngIf="loading" class="d-flex justify-content-center py-5">
+  <div class="spinner-border text-primary"></div>
+</div>
+
+<div *ngIf="!loading && incidencia">
+  <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+      <p class="small text-muted mb-1">Incidencias / Lista / Detalle</p>
+      <div class="d-flex align-items-center gap-3 mt-1">
+        <h1 class="h4 fw-bold tracking-tight mb-0">INC-00{{ incidencia.id }}</h1>
+        <div class="d-flex align-items-center gap-2 border rounded px-2 py-1 bg-white">
+          <span class="rounded-circle" style="width: 8px; height: 8px;" [ngClass]="{
+            'bg-secondary': incidencia.estado === 'REGISTRADA',
+            'bg-primary': incidencia.estado === 'ASIGNADA',
+            'bg-warning': incidencia.estado === 'EN_PROCESO',
+            'bg-success': incidencia.estado === 'ATENDIDA',
+            'bg-dark': incidencia.estado === 'CERRADA'
+          }"></span>
+          <span class="small fw-medium text-muted">{{ incidencia.estado | titlecase }}</span>
+        </div>
+        
+        <div class="d-flex align-items-center gap-2 border rounded px-2 py-1 bg-white">
+          <span class="rounded-circle" style="width: 8px; height: 8px;" [ngClass]="{
+            'bg-danger': incidencia.prioridad === 'ALTA',
+            'bg-warning': incidencia.prioridad === 'MEDIA',
+            'bg-info': incidencia.prioridad === 'BAJA'
+          }"></span>
+          <span class="small fw-medium text-muted">Prioridad {{ incidencia.prioridad }}</span>
+        </div>
+      </div>
+    </div>
+    <a routerLink="/coordinador/incidencias" class="btn btn-outline-secondary btn-sm">Volver a la lista</a>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success small py-2">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert alert-danger small py-2">{{ errorMessage }}</div>
+
+  <div class="row g-4">
+    <!-- Datos + acciones -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <h2 class="h6 fw-bold mb-4">Datos de la incidencia</h2>
+          <div class="row g-4 text-sm mb-4">
+            <div class="col-sm-6"><p class="text-muted small mb-1">Título</p><p class="fw-medium mb-0">{{ incidencia.titulo }}</p></div>
+            <div class="col-sm-6"><p class="text-muted small mb-1">Área ID</p><p class="fw-medium mb-0">{{ incidencia.areaId }}</p></div>
+            <div class="col-sm-6"><p class="text-muted small mb-1">Prioridad</p><p class="fw-medium mb-0">{{ incidencia.prioridad }}</p></div>
+            <div class="col-sm-6"><p class="text-muted small mb-1">Responsable ID</p><p class="fw-medium mb-0">{{ incidencia.asignadoAId || 'No asignado' }}</p></div>
+            <div class="col-sm-6"><p class="text-muted small mb-1">Registrada por ID</p><p class="fw-medium mb-0">{{ incidencia.reportadoPorId }}</p></div>
+            <div class="col-sm-6"><p class="text-muted small mb-1">Fecha de registro</p><p class="fw-medium mb-0">{{ incidencia.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</p></div>
+          </div>
+          <div class="pt-3 border-top">
+            <p class="text-muted small mb-1">Descripción</p>
+            <p class="small mb-0">{{ incidencia.descripcion }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acciones del coordinador -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="h6 fw-bold mb-3">Gestionar incidencia</h2>
+          <form [formGroup]="estadoForm" (ngSubmit)="actualizarEstado()">
+            <div class="row g-2 align-items-end">
+              <div class="col-sm-8">
+                <label class="form-label small text-muted mb-1">Cambiar estado</label>
+                <select formControlName="estado" class="form-select text-sm">
+                  <option value="REGISTRADA">Registrada</option>
+                  <option value="ASIGNADA">Asignada</option>
+                  <option value="EN_PROCESO">En Proceso</option>
+                  <option value="ATENDIDA">Atendida</option>
+                  <option value="CERRADA">Cerrada</option>
+                </select>
+              </div>
+              <div class="col-sm-4">
+                <button type="submit" class="btn btn-primary w-100 fw-bold" [disabled]="estadoForm.invalid || updating">
+                  <span *ngIf="updating" class="spinner-border spinner-border-sm me-2"></span>
+                  Actualizar estado
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fechas -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="h6 fw-bold mb-4">Fechas importantes</h2>
+          <div class="mb-3">
+            <p class="text-muted small mb-1">Creación</p>
+            <p class="small fw-medium">{{ incidencia.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div class="mb-0" *ngIf="incidencia.fechaCierre">
+            <p class="text-muted small mb-1">Cierre</p>
+            <p class="small fw-medium">{{ incidencia.fechaCierre | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div class="mb-0" *ngIf="!incidencia.fechaCierre">
+            <p class="text-muted small mb-1">Cierre</p>
+            <p class="small fw-medium text-muted">Aún no cerrada</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

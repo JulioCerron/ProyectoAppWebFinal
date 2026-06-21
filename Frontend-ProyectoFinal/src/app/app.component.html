@@ -1,0 +1,105 @@
+<ng-container *ngIf="isLoggedIn && !isLoginPage; else loginTpl">
+  <div class="h-screen flex flex-col overflow-hidden bg-light text-dark">
+    <!-- Header Global -->
+    <header class="h-16 flex-shrink-0 bg-primary text-white flex items-center justify-between px-4 shadow-sm relative z-30" style="background: linear-gradient(90deg, #0f4c81, #165d9c, #1d6eaf);">
+      <div class="d-flex align-items-center gap-3">
+        <div class="bg-white bg-opacity-10 rounded d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px;">H</div>
+        <span class="fs-5 fw-bold tracking-tight">HANDFAST</span>
+        <span class="d-none d-sm-inline text-white-50 small border-start border-white-50 ps-3 ms-1">Gestión Global</span>
+      </div>
+  
+      <div class="d-flex align-items-center gap-4">
+        <div class="d-flex align-items-center gap-2 ps-3 border-start border-white-50">
+          <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center fw-bold small" style="width: 36px; height: 36px;">
+            {{ nombre.charAt(0) | uppercase }}
+          </div>
+          <span class="small fw-medium d-none d-sm-inline">{{ nombre }}</span>
+        </div>
+      </div>
+    </header>
+  
+    <!-- Cuerpo: Sidebar + Contenido -->
+    <div class="d-flex flex-grow-1 overflow-hidden">
+      
+      <!-- Súper Sidebar -->
+      <aside class="bg-white border-end d-none d-md-flex flex-column overflow-y-auto shadow-sm" style="width: 260px;">
+        <nav class="flex-grow-1 p-3 d-flex flex-column gap-1">
+          
+          <!-- SECCIÓN ADMIN -->
+          <ng-container *ngIf="isAdmin">
+            <p class="px-3 pt-2 pb-1" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #6c757d;">Administración</p>
+            <a routerLink="/admin/empleados" routerLinkActive="bg-primary bg-opacity-10 text-primary fw-bold" class="d-flex align-items-center rounded px-3 py-2 text-decoration-none text-dark mb-1">
+              <span>Gestión de Empleados</span>
+            </a>
+            <a routerLink="/admin/usuarios" routerLinkActive="bg-primary bg-opacity-10 text-primary fw-bold" class="d-flex align-items-center rounded px-3 py-2 text-decoration-none text-dark mb-1">
+              <span>Cuentas de Usuario</span>
+            </a>
+          </ng-container>
+
+          <!-- SECCIÓN COORDINADOR -->
+          <ng-container *ngIf="isAdmin || isCoordinador">
+            <p class="px-3 pt-2 pb-1" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #6c757d;">Coordinación</p>
+            <a routerLink="/coordinador/incidencias" routerLinkActive="bg-primary bg-opacity-10 text-primary fw-bold" class="d-flex align-items-center rounded px-3 py-2 text-decoration-none text-dark mb-1">
+              <span>Lista de Incidencias</span>
+            </a>
+          </ng-container>
+
+          <!-- SECCIÓN SUPERVISOR -->
+          <ng-container *ngIf="isAdmin || isSupervisor">
+            <p class="px-3 pt-2 pb-1" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #6c757d;">Operaciones</p>
+            <a routerLink="/supervisor/registrar" routerLinkActive="bg-primary bg-opacity-10 text-primary fw-bold" class="d-flex align-items-center rounded px-3 py-2 text-decoration-none text-dark mb-1">
+              <span>Registrar Incidencia</span>
+            </a>
+            <a routerLink="/supervisor/incidencias" routerLinkActive="bg-primary bg-opacity-10 text-primary fw-bold" class="d-flex align-items-center rounded px-3 py-2 text-decoration-none text-dark mb-1">
+              <span>Mis Incidencias</span>
+            </a>
+          </ng-container>
+
+          <!-- SECCIÓN SST -->
+          <ng-container *ngIf="isAdmin || isSst">
+            <p class="px-3 pt-2 pb-1" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #6c757d;">Seguridad (SST)</p>
+            <a routerLink="/sst/evaluaciones" routerLinkActive="bg-primary bg-opacity-10 text-primary fw-bold" class="d-flex align-items-center rounded px-3 py-2 text-decoration-none text-dark mb-1">
+              <span>Evaluaciones de Riesgo</span>
+            </a>
+          </ng-container>
+
+          <!-- SECCIÓN LOGÍSTICA -->
+          <ng-container *ngIf="isAdmin || isLogistica">
+            <p class="px-3 pt-2 pb-1" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #6c757d;">Logística</p>
+            <a routerLink="/auxiliar/inventario" routerLinkActive="bg-primary bg-opacity-10 text-primary fw-bold" class="d-flex align-items-center rounded px-3 py-2 text-decoration-none text-dark mb-1">
+              <span>Inventario</span>
+            </a>
+            <a routerLink="/auxiliar/solicitudes" routerLinkActive="bg-primary bg-opacity-10 text-primary fw-bold" class="d-flex align-items-center rounded px-3 py-2 text-decoration-none text-dark mb-1">
+              <span>Solicitudes</span>
+            </a>
+          </ng-container>
+
+        </nav>
+  
+        <!-- Identidad + Cerrar sesión -->
+        <div class="p-3 border-top">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
+              {{ nombre.charAt(0) | uppercase }}
+            </div>
+            <div style="line-height: 1.2;">
+              <p class="mb-0 small fw-bold">{{ nombre }}</p>
+              <p class="mb-0 text-muted" style="font-size: 12px;">{{ rol }}</p>
+            </div>
+          </div>
+          <button (click)="logout()" class="btn btn-outline-secondary w-100 fw-medium small text-dark">Cerrar sesión</button>
+        </div>
+      </aside>
+  
+      <!-- Contenido dinámico -->
+      <main class="flex-grow-1 overflow-auto bg-light p-0">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Para la pantalla de Login o si no hay sesión -->
+<ng-template #loginTpl>
+  <router-outlet></router-outlet>
+</ng-template>

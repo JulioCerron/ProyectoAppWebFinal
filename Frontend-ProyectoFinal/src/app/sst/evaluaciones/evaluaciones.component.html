@@ -1,0 +1,57 @@
+<div class="mb-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <div>
+      <p class="small text-muted mb-1">SST / Evaluaciones</p>
+      <div class="d-flex align-items-center gap-3 mt-1">
+        <h1 class="h3 fw-bold mb-0">Evaluaciones de Riesgo Pendientes</h1>
+        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">{{ incidencias.length }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0">
+  <div class="card-header bg-white p-3 border-bottom d-flex gap-3">
+    <input type="text" class="form-control w-25" placeholder="Buscar por código..." (input)="filtroCodigo = $any($event.target).value; aplicarFiltros()">
+  </div>
+  
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light text-muted small">
+        <tr>
+          <th class="text-uppercase py-3 ps-4">Código</th>
+          <th class="text-uppercase py-3">Título</th>
+          <th class="text-uppercase py-3">Estado Actual</th>
+          <th class="text-uppercase py-3">Prioridad</th>
+          <th class="text-uppercase py-3 text-end pe-4">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="5" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted mb-0">Cargando incidencias...</p>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && incidenciasFiltradas.length === 0">
+          <td colspan="5" class="text-center py-5 text-muted">No hay incidencias para mostrar.</td>
+        </tr>
+        <tr *ngFor="let inc of incidenciasFiltradas">
+          <td class="ps-4 fw-bold text-primary">{{ inc.codigo }}</td>
+          <td class="fw-medium text-dark">{{ inc.titulo }}</td>
+          <td>
+            <span class="badge bg-warning bg-opacity-10 text-warning">{{ inc.estado }}</span>
+          </td>
+          <td>
+            <span class="badge bg-secondary bg-opacity-10 text-secondary">{{ inc.prioridad }}</span>
+          </td>
+          <td class="text-end pe-4">
+            <a [routerLink]="['/sst/evaluaciones', inc.id]" class="btn btn-sm btn-outline-primary fw-medium">
+              Evaluar
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
